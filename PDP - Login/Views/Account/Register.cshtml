@@ -1,0 +1,33 @@
+﻿@model PDP___Login.Models.RegisterViewModel
+
+<h2>Register</h2>
+<div asp-validation-summary="All" class="text-danger"></div>
+<form asp-action="Register" method="post">
+
+    <div>
+        <label>Full Name</label>
+        <input asp-for="FullName" />
+    </div>
+
+    <div>
+        <label>Department</label>
+        <input asp-for="Department" />
+    </div>
+
+    <div>
+        <label>Email</label>
+        <input asp-for="Email" />
+    </div>
+
+    <div>
+        <label>Password</label>
+        <input asp-for="Password" type="password" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+        <small class="text-muted">
+            Password must be at least 6 characters, include uppercase, number, and symbol.
+        </small>
+    </div>
+
+    <button type="submit">Register</button>
+
+</form>

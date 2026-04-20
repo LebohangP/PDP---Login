@@ -1,0 +1,43 @@
+﻿@model List<UserWithRoleViewModel>
+
+<h2>Users</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Full Name</th>
+            <th>Email</th>
+            <th>Department</th>
+            <th>Role</th>
+            <th>Assign Role</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.FullName</td>
+                <td>@user.Email</td>
+                <td>@user.Department</td>
+                <td>
+                    <span class="badge bg-info">@user.Role</span>
+                </td>
+                <td>
+                    <form asp-action="AssignRole" method="post">
+                        <input type="hidden" name="userId" value="@user.Id" />
+
+                        <select name="role" class="form-select">
+                            <option>Employee</option>
+                            <option>Manager</option>
+                            <option>HR</option>
+                        </select>
+
+                        <button type="submit" class="btn btn-primary mt-1">
+                            Assign
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
