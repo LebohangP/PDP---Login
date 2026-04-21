@@ -8,105 +8,117 @@ using System.Security.Claims;
 
 namespace PDP___Login.Controllers
 {
-    [Authorize(Roles ="Employee")]
+    [Authorize(Roles = "Employee")]
     public class EmployeeController : Controller
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly ApplicationDbContext _context;
 
-        public EmployeeController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        private readonly UserManager<ApplicationUser> _userManager;
+
+        public EmployeeController(UserManager<ApplicationUser> userManager, ApplicationDbContext context)
         {
-            _signInManager = signInManager;
             _userManager = userManager;
+            _context = context;
         }
+
+        // ============================
+        // DASHBOARD
+        // ============================
         public IActionResult Index()
         {
             return View();
         }
-        public class PDPController : Controller
+
+        // ============================
+        // GET: Submit PDP Form
+        // ============================
+        public async Task<IActionResult> SubmitPDP()
         {
-            private readonly ApplicationDbContext _context;
+            var user = await _userManager.GetUserAsync(User);
 
-            public PDPController(ApplicationDbContext context)
+            if (user == null)
+                return NotFound();
+
+            var model = new UserPDPViewModel
             {
-                _context = context;
-            }
+                FullName = user.FullName,
+                Department = user.Department
+            };
 
-            // GET
-            public IActionResult AddPDPs()
-            {
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return View(model);
+        }
 
-                var user = _context.Users.FirstOrDefault(u => u.Id == userId);
+        // ============================
+        // POST: Submit PDP
+        // ============================
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SubmitPDP(UserPDPViewModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
 
-                var model = new UserPDPViewModel
-                {
-                    FullName = user.FullName,
-                    Department = user.Department
-                };
+            if (user == null)
+                return NotFound();
 
+            // 🔥 re-fill values
+            model.FullName = user.FullName;
+            model.Department = user.Department;
+
+            if (!ModelState.IsValid)
                 return View(model);
-            }
 
-            // POST
-            [HttpPost]
-            public async Task<IActionResult> AddPDPs(UserPDPViewModel model)
+            string filePath = null;
+
+            if (model.PdfFile != null && model.PdfFile.Length > 0)
             {
-                if (!ModelState.IsValid)
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
+
+                if (!Directory.Exists(uploadsFolder))
+                    Directory.CreateDirectory(uploadsFolder);
+
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(model.PdfFile.FileName);
+                var fullPath = Path.Combine(uploadsFolder, fileName);
+
+                using (var stream = new FileStream(fullPath, FileMode.Create))
                 {
-                    return View(model);
+                    await model.PdfFile.CopyToAsync(stream);
                 }
 
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-                string filePath = null;
-
-                // Upload PDF
-                if (model.PdfFile != null && model.PdfFile.Length > 0)
-                {
-                    var fileName = Path.GetFileName(model.PdfFile.FileName);
-                    var path = Path.Combine("wwwroot/uploads", fileName);
-
-                    using (var stream = new FileStream(path, FileMode.Create))
-                    {
-                        await model.PdfFile.CopyToAsync(stream);
-                    }
-
-                    filePath = "/uploads/" + fileName;
-                }
-
-                var pdp = new PDP
-                {
-                    Description = model.Description,
-                    DateSubmitted = DateTime.Now,
-                    UserId = userId,
-                    FilePath = filePath,
-                    Status = "Pending"
-
-
-                };
-
-                _context.PDPs.Add(pdp);
-                await _context.SaveChangesAsync();
-
-                return RedirectToAction("MyPDPs");
+                filePath = "/uploads/" + fileName;
             }
-            public IActionResult MyPDPs()
+
+            var pdp = new PDP
             {
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                Description = model.Description,
+                DateSubmitted = DateTime.Now,
+                UserId = user.Id,
+                FilePath = filePath,
+                Status = "Pending"
+            };
 
-                var pdps = _context.PDPs
-                    .Where(p => p.UserId == userId)
-                    .ToList();
+            _context.PDPs.Add(pdp);
+            await _context.SaveChangesAsync();
 
-                return View(pdps);
-            }
-            public IActionResult Index()
-            {
-                return View();
-            }
+            return RedirectToAction(nameof(MyPDPs));
+        }
 
+        // ============================
+        // VIEW: My PDP Statuses
+        // ============================
+        public IActionResult MyPDPs()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
+            var pdps = _context.PDPs
+                .Where(p => p.UserId == userId)
+                .OrderByDescending(p => p.DateSubmitted)
+                .ToList();
+
+            return View(pdps);
         }
     }
+
+
+
 }
+

@@ -66,7 +66,7 @@ namespace PDP___Login.Controllers
             {
                 return View(model);
             }
-            Console.WriteLine("LOGIN HIT");
+            
             var result = await _signInManager.PasswordSignInAsync(
                 model.Email,
                 model.Password,

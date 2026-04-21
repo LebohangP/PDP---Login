@@ -58,7 +58,7 @@
 
         input[readonly] {
             background-color: #ecf0f1;
-            color: #7f8c8d;
+            color: black;
         }
 
         .btn-submit {
@@ -85,6 +85,9 @@
             border-radius: 10px 10px 0 0;
             margin: -30px -30px 20px -30px;
         }
+        .header-bar h2{
+            color:white
+        }
     </style>
 </head>
 
@@ -98,15 +101,18 @@
 
         <form asp-action="MyPDPs" method="post" enctype="multipart/form-data">
 
-            <label>Full Name</label>
-            <input asp-for="FullName" />
-           
+            <div>
+                <label>Full Name</label>
+                <input asp-for="FullName" class="form-control" readonly />
+            </div>
 
-            <label>Department</label>
-            <input asp-for="Department" />
+            <div>
+                <label>Department</label>
+                <input asp-for="Department" class="form-control" readonly />
+            </div>
 
             <label>Description</label>
-            <textarea asp-for="Description"></textarea>
+            <input asp-for="Description"></input>
 
             <label>Date Submitted</label>
             <input value="@DateTime.Now.ToString("yyyy-MM-dd HH:mm")" readonly class="form-control" />
@@ -114,7 +120,7 @@
             <label>Upload PDF</label>
             <input type="file" asp-for="PdfFile" accept="application/pdf" />
 
-            <button type="submit" class="btn-submit">Submit PDP</button>
+            <<button type="submit">Submit PDP</button>
 
         </form>
 
