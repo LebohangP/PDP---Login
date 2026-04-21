@@ -1,0 +1,59 @@
+﻿@model DashboardViewModel
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+    .chart-container {
+        width: 300px;
+        margin: auto;
+        position: relative;
+    }
+
+    #centerText {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 24px;
+        font-weight: bold;
+        color: #2c3e50;
+    }
+</style>
+
+<div class="chart-container">
+    <canvas id="wheelChart"></canvas>
+    <div id="centerText">@Model.PercentApproved%</div>
+</div>
+
+<script>
+    const ctx = document.getElementById('wheelChart').getContext('2d');
+
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            datasets: [{
+                data: [
+                    @Model.PercentApproved,
+                    @(100 - Model.PercentApproved)
+                ],
+                backgroundColor: [
+                    '#27ae60',   // filled (approved)
+                    '#ecf0f1'    // remaining
+                ],
+                borderWidth: 0,
+                cutout: '75%'
+            }]
+        },
+        options: {
+            responsive: true,
+            animation: {
+                animateRotate: true,
+                duration: 1500
+            },
+            plugins: {
+                tooltip: { enabled: false },
+                legend: { display: false }
+            }
+        }
+    });
+</script>

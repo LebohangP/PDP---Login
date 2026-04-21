@@ -39,7 +39,7 @@ namespace PDP___Login.Controllers
             var result = await _userManager.CreateAsync(user, model.Password);
             if (result.Succeeded)
             {
-                await _userManager.AddToRoleAsync(user, "Employee");
+                //await _userManager.AddToRoleAsync(user, "Employee");
                 TempData["SuccessMessage"] = "Registration successful. Please log in.";
 
                 return RedirectToAction("Login", "Account");

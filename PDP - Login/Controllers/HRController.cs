@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PDP___Login.Models;
 
 namespace PDP___Login.Controllers
@@ -23,6 +24,10 @@ namespace PDP___Login.Controllers
         //    var users = _userManager.Users.ToList();
         //    return View(users);
         //}
+        public IActionResult Dashboard()
+        {
+            return View();
+        }
         [HttpPost]
         public async Task<IActionResult> AssignRole(string userId, string role)
         {
@@ -85,5 +90,6 @@ namespace PDP___Login.Controllers
 
             return View(userList);
         }
+        
     }
 }

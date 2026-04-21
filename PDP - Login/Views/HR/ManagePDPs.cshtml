@@ -1,0 +1,25 @@
+﻿@model List<PDP>
+
+<h2>Manage PDPs</h2>
+
+<table class="table">
+    <tr>
+        <th>User</th>
+        <th>Description</th>
+        <th>Status</th>
+        <th>Actions</th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.User.FullName</td>
+            <td>@item.Description</td>
+            <td>@item.Status</td>
+            <td>
+                <a href="/PDP/Approve/@item.Id">Approve</a> |
+                <a href="/PDP/Reject/@item.Id">Reject</a>
+            </td>
+        </tr>
+    }
+</table>

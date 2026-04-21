@@ -5,5 +5,7 @@ namespace PDP___Login.Models
     {
         public string FullName {  get; set; }
         public string Department {  get; set; }
+
+        public virtual ICollection<PDP> pDPs { get; set; }
     }
 }

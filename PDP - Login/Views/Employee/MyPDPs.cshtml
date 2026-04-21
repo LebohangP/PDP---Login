@@ -1,0 +1,44 @@
+﻿@model List<PDP>
+
+<h2>My Submitted PDPs</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Description</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>File</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Description</td>
+                <td>@item.DateSubmitted.ToShortDateString()</td>
+                <td>
+                    @if (item.Status == "Pending")
+                    {
+                        <span style="color: orange;">Pending</span>
+                    }
+                    else if (item.Status == "Approved")
+                    {
+                        <span style="color: green;">Approved</span>
+                    }
+                    else
+                    {
+                        <span style="color: red;">Rejected</span>
+                    }
+                </td>
+                <td>
+                    @if (!string.IsNullOrEmpty(item.FilePath))
+                    {
+                        <a href="@item.FilePath" target="_blank">View PDF</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

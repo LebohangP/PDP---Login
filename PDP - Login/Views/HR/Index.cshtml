@@ -20,7 +20,14 @@
                 <td>@user.Email</td>
                 <td>@user.Department</td>
                 <td>
-                    <span class="badge bg-info">@user.Role</span>
+                    @if (user.Role == "No Role")
+                    {
+                        <span class="badge bg-warning">No Role</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">@user.Role</span>
+                    }
                 </td>
                 <td>
                     <form asp-action="AssignRole" method="post">

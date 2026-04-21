@@ -1,12 +1,123 @@
-﻿@using Microsoft.AspNetCore.Identity
+﻿@model PDP___Login.Models.UserPDPViewModel
+@using Microsoft.AspNetCore.Identity
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 
-<li class="nav-item">
+@* <li class="nav-item">
     <a class="nav-link text-dark" asp-area="" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a>
 </li>
 <li class="nav-item">
     <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
         <button type="submit" class="nav-link btn btn-link text-dark">Logout</button>
     </form>
-</li>
+</li> *@
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+        }
+
+        .container {
+            width: 50%;
+            margin: 50px auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 25px;
+        }
+
+        label {
+            font-weight: bold;
+            color: #34495e;
+            display: block;
+            margin-top: 15px;
+        }
+
+        input[type="text"],
+        textarea,
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccd1d9;
+            border-radius: 6px;
+            background-color: #fdfdfd;
+        }
+
+        textarea {
+            height: 120px;
+            resize: none;
+        }
+
+        input[readonly] {
+            background-color: #ecf0f1;
+            color: #7f8c8d;
+        }
+
+        .btn-submit {
+            width: 100%;
+            margin-top: 20px;
+            padding: 12px;
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+            .btn-submit:hover {
+                background-color: #1a252f;
+            }
+
+        .header-bar {
+            background-color: #2c3e50;
+            color: white;
+            padding: 12px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+            margin: -30px -30px 20px -30px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="header-bar">
+            <h2>PDP Submission Form</h2>
+        </div>
+
+        <form asp-action="MyPDPs" method="post" enctype="multipart/form-data">
+
+            <label>Full Name</label>
+            <input asp-for="FullName" />
+           
+
+            <label>Department</label>
+            <input asp-for="Department" />
+
+            <label>Description</label>
+            <textarea asp-for="Description"></textarea>
+
+            <label>Date Submitted</label>
+            <input value="@DateTime.Now.ToString("yyyy-MM-dd HH:mm")" readonly class="form-control" />
+
+            <label>Upload PDF</label>
+            <input type="file" asp-for="PdfFile" accept="application/pdf" />
+
+            <button type="submit" class="btn-submit">Submit PDP</button>
+
+        </form>
+
+    </div>
+
+</body>
