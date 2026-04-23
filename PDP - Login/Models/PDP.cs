@@ -3,13 +3,14 @@
     public class PDP
     {
         public int Id { get; set; }
-        public string Description { get; set; }
-        public DateTime DateSubmitted { get; set; }= DateTime.Now;
+        public string Title { get; set; }
 
-        public string UserId {  get; set; }
-        public virtual ApplicationUser User {  get; set; }
-        public string FilePath { get; set; } 
+        public string Status { get; set; } = "Pending";
+        public DateTime SubmittedAt { get; set; }
 
-        public string Status {  get; set; }
+        public int EmployeeID { get; set; }
+        public Employee Employee { get; set; }
+
+        public ICollection<PDPFile> Files { get; set; }
     }
 }

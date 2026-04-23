@@ -1,14 +1,72 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using PDP___Login.Data;
 
 namespace PDP___Login.Controllers
 {
-    [Authorize(Roles = "Manager")]
+
     public class ManagerController : Controller
     {
+        private readonly AppDbContext _context;
+
+        public ManagerController(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        // ALL SUBMITTED PDPs
         public IActionResult Index()
         {
-            return View();
+            var pdps = _context.PDPs
+                .Include(p => p.Files)
+                .Include(p => p.Employee)
+                .ToList();
+
+            return View(pdps);
+        }
+        public IActionResult UpdateStatus(int id, string status)
+        {
+            var pdp = _context.PDPs.FirstOrDefault(p => p.Id == id);
+
+            if (pdp == null)
+            {
+                return NotFound();
+            }
+
+            pdp.Status = status;
+
+            _context.SaveChanges();
+
+            if (status == "Approved")
+            {
+                return RedirectToAction("ApprovedPDPs");
+            }
+            else if (status == "Rejected")
+            {
+                return RedirectToAction("RejectedPDPs");
+            }
+
+            return RedirectToAction("Index");
+        }
+        public IActionResult ApprovedPDPs()
+        {
+            var pdps = _context.PDPs
+                .Where(p => p.Status == "Approved")
+                .Include(p => p.Files)
+                .ToList();
+
+            return View(pdps);
+        }
+        public IActionResult RejectedPDPs()
+        {
+            var pdps = _context.PDPs
+                .Where(p => p.Status == "Rejected")
+                .Include(p => p.Files)
+                .ToList();
+
+            return View(pdps);
         }
     }
 }
+

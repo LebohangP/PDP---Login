@@ -1,0 +1,26 @@
+﻿@model PDP___Login.Models.PDP
+@{
+    Layout = "~/Views/Shared/_EmployeeLayout.cshtml";
+}
+
+<h2>Edit PDP Submission</h2>
+
+<form asp-action="EditSubmission" method="post" enctype="multipart/form-data">
+
+    <input type="hidden" asp-for="Id" />
+
+    <div>
+        <label>Title</label>
+        <input asp-for="Title" class="form-control" />
+    </div>
+
+    <div class="mt-3">
+        <label>Replace PDF File</label>
+        <input type="file" name="file" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">
+        Update Submission
+    </button>
+
+</form>

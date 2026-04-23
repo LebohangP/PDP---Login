@@ -2,94 +2,219 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PDP___Login.Data;
 using PDP___Login.Models;
+using System.Collections.Generic;
 
 namespace PDP___Login.Controllers
 {
-    [Authorize(Roles = "HR")]
-    public class HRController : Controller
+
+
+    public class AdminController : Controller
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly AppDbContext _context;
 
-        public HRController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        public AdminController(AppDbContext context)
         {
-            _signInManager = signInManager;
-            _userManager = userManager;
+            _context = context;
         }
-
-        //[Authorize(Roles = "HR")]
-        //public async Task<IActionResult> Users()
-        //{
-        //    var users = _userManager.Users.ToList();
-        //    return View(users);
-        //}
         public IActionResult Dashboard()
         {
             return View();
         }
+        // Show users without roles
+        public IActionResult NewRegistrants()
+        {
+            var roles = _context.Roles.ToList();
+
+            var employees = (from e in _context.Employees
+                             join u in _context.Users on e.UserID equals u.UserID
+                             select new UserWithRoleViewModel
+                             {
+                                 UserId = u.UserID,
+                                 FirstName = e.FirstName,
+                                 LastName = e.LastName,
+                                 Email = e.Email,
+                                 Department = e.Department,
+                                 Roles = roles
+                             }).ToList();
+
+            return View(employees);
+        }
+
+        // Assign role
         [HttpPost]
-        public async Task<IActionResult> AssignRole(string userId, string role)
+        public IActionResult AssignRole(int userId, int roleId)
         {
-            var user = await _userManager.FindByIdAsync(userId);
+            var user = _context.Users
+                .FirstOrDefault(u => u.UserID == userId);
 
-            if (user != null)
-            {
-                var currentRoles = await _userManager.GetRolesAsync(user);
+            if (user == null)
+                return NotFound();
 
-                if (currentRoles.Any())
-                {
-                    await _userManager.RemoveFromRolesAsync(user, currentRoles);
-                }
+            user.RoleId  = roleId;
 
-                await _userManager.AddToRoleAsync(user, role);
-            }
+            _context.Users.Update(user); // 🔥 force tracking update
 
-            return RedirectToAction("Users");
+            _context.SaveChanges();
+
+            return RedirectToAction("Employees");
         }
-        public async Task<IActionResult> Index()
+        public IActionResult Employees()
         {
-            var users = _userManager.Users.ToList();
+            var employees = (from e in _context.Employees
+                             join u in _context.Users on e.UserID equals u.UserID
+                             join r in _context.Roles on u.RoleId equals r.RoleId
+                             where u.RoleId != null && r.Name != "No Role"
+                             select new UserWithRoleViewModel
+                             {
+                                 FirstName = e.FirstName,
+                                 LastName = e.LastName,
+                                 Department = e.Department,
+                                 Email = u.Email,
+                                 Role = r
+                             }).ToList();
 
-            var model = new List<UserWithRoleViewModel>();
-
-            foreach (var user in users)
-            {
-                var roles = await _userManager.GetRolesAsync(user);
-
-                model.Add(new UserWithRoleViewModel
-                {
-                    Id = user.Id,
-                    FullName = user.FullName,
-                    Department = user.Department,
-                    Email = user.Email,
-                    Role = roles.FirstOrDefault() ?? "No Role"
-                });
-            }
-
-            return View(model); // ✅ correct type
+            return View(employees);
         }
-        public async Task<IActionResult> Users()
-        {
-            var users = _userManager.Users.ToList();
-            var userList = new List<UserWithRoleViewModel>();
-
-            foreach (var user in users)
-            {
-                var roles = await _userManager.GetRolesAsync(user);
-
-                userList.Add(new UserWithRoleViewModel
-                {
-                    Id = user.Id,
-                    FullName = user.FullName,
-                    Department = user.Department,
-                    Email = user.Email,
-                    Role = roles.FirstOrDefault() ?? "No Role"
-                });
-            }
-
-            return View(userList);
-        }
-        
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //[Authorize(Roles = "HR")]
+    //public class HRController : Controller
+    //{
+    //    private readonly UserManager<ApplicationUser> _userManager;
+    //    private readonly SignInManager<ApplicationUser> _signInManager;
+
+    //    public HRController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+    //    {
+    //        _signInManager = signInManager;
+    //        _userManager = userManager;
+    //    }
+
+    //    //[Authorize(Roles = "HR")]
+    //    //public async Task<IActionResult> Users()
+    //    //{
+    //    //    var users = _userManager.Users.ToList();
+    //    //    return View(users);
+    //    //}
+    //    public IActionResult Dashboard()
+    //    {
+    //        return View();
+    //    }
+    //    [HttpPost]
+    //    public async Task<IActionResult> AssignRole(string userId, string role)
+    //    {
+    //        var user = await _userManager.FindByIdAsync(userId);
+
+    //        if (user != null)
+    //        {
+    //            var currentRoles = await _userManager.GetRolesAsync(user);
+
+    //            if (currentRoles.Any())
+    //            {
+    //                await _userManager.RemoveFromRolesAsync(user, currentRoles);
+    //            }
+
+    //            await _userManager.AddToRoleAsync(user, role);
+    //        }
+
+    //        return RedirectToAction("Users");
+    //    }
+    //    public async Task<IActionResult> Index()
+    //    {
+    //        var users = _userManager.Users.ToList();
+
+    //        var model = new List<UserWithRoleViewModel>();
+
+    //        foreach (var user in users)
+    //        {
+    //            var roles = await _userManager.GetRolesAsync(user);
+
+    //            model.Add(new UserWithRoleViewModel
+    //            {
+    //                Id = user.Id,
+    //                FullName = user.FullName,
+    //                Department = user.Department,
+    //                Email = user.Email,
+    //                Role = roles.FirstOrDefault() ?? "No Role"
+    //            });
+    //        }
+
+    //        return View(model); // ✅ correct type
+    //    }
+    //    public async Task<IActionResult> Users()
+    //    {
+    //        var users = _userManager.Users.ToList();
+    //        var userList = new List<UserWithRoleViewModel>();
+
+    //        foreach (var user in users)
+    //        {
+    //            var roles = await _userManager.GetRolesAsync(user);
+
+    //            userList.Add(new UserWithRoleViewModel
+    //            {
+    //                Id = user.Id,
+    //                FullName = user.FullName,
+    //                Department = user.Department,
+    //                Email = user.Email,
+    //                Role = roles.FirstOrDefault() ?? "No Role"
+    //            });
+    //        }
+
+    //        return View(userList);
+    //    }
+
+    //}
 }

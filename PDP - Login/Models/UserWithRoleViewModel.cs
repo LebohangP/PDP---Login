@@ -1,11 +1,13 @@
-﻿namespace PDP___Login.Models
+﻿using System.Collections.Generic;
+namespace PDP___Login.Models;
+public class UserWithRoleViewModel
 {
-    public class UserWithRoleViewModel
-    {
-        public string Id { get; set; }
-        public string FullName { get; set; }
-        public string Department { get; set; }
-        public string Email { get; set; }
-        public string Role { get; set; }
-    }
+    public int UserId { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public string Email { get; set; }
+    public string Department { get; set; }
+
+    public List<Role> Roles { get; set; }
+    public Role Role { get; set; }
 }

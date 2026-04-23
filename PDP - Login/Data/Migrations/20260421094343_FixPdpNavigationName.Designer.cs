@@ -11,7 +11,7 @@ using PDP___Login.Data;
 
 namespace PDP___Login.Data.Migrations
 {
-    [DbContext(typeof(ApplicationDbContext))]
+    //[DbContext(typeof(ApplicationDbContext))]
     [Migration("20260421094343_FixPdpNavigationName")]
     partial class FixPdpNavigationName
     {

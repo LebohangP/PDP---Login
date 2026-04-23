@@ -1,0 +1,47 @@
+﻿@model List<UserWithRoleViewModel>
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2 class="mb-3">New Registrants</h2>
+
+<table class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>Full Name</th>
+            <th>Email</th>
+            <th>Department</th>
+            <th>Role</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.FirstName @user.LastName</td>
+                <td>@user.Email</td>
+                <td>@user.Department</td>
+                <td>
+                    <form asp-action="AssignRole" method="post">
+
+                        <input type="hidden" name="userId" value="@user.UserId" />
+
+                        <select name="roleId" class="form-select">
+                            @foreach (var role in user.Roles)
+                            {
+                                <option value="@role.RoleId">@role.Name</option>
+                            }
+                        </select>
+
+                        <button type="submit" class="btn btn-primary btn-sm mt-1">
+                            Allocate
+                        </button>
+
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

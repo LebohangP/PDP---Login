@@ -1,0 +1,77 @@
+﻿@{
+    Layout = "~/Views/Shared/_EmployeeLayout.cshtml";
+}
+
+<style>
+    .pdp-container {
+        max-width: 600px;
+        margin: 50px auto;
+    }
+
+    .pdp-card {
+        background: #fff;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    }
+
+    .pdp-title {
+        font-size: 22px;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .form-control {
+        border-radius: 8px;
+    }
+
+    .btn-submit {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        background: #2563eb;
+        color: white;
+        font-weight: bold;
+        border: none;
+    }
+
+        .btn-submit:hover {
+            background: #1e40af;
+        }
+</style>
+
+<div class="pdp-container">
+    <div class="pdp-card">
+
+        <div class="pdp-title">Submit PDP</div>
+
+        <form asp-action="SubmitPDP" method="post" enctype="multipart/form-data">
+
+            <!-- Title -->
+            <div class="mb-3">
+                <label class="form-label">PDP Title</label>
+                <input type="text" name="Title" class="form-control" placeholder="Enter PDP title" required />
+            </div>
+
+            <!-- Date (auto-filled) -->
+            <div class="mb-3">
+                <label class="form-label">Date</label>
+                <input type="text" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" readonly />
+            </div>
+
+            <!-- File Upload -->
+            <div class="mb-3">
+                <label class="form-label">Upload PDF</label>
+                <input type="file" name="file" class="form-control" accept=".pdf" required />
+            </div>
+
+            <!-- Submit -->
+            <button type="submit" class="btn-submit">
+                Submit PDP
+            </button>
+
+        </form>
+
+    </div>
+</div>

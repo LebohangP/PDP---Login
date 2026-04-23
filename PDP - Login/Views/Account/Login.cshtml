@@ -1,25 +1,107 @@
 ﻿@model PDP___Login.Models.LoginViewModel
 
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success">
-        @TempData["SuccessMessage"]
-    </div>
+@{
+    Layout = null; /* or use your shared layout if you prefer */
 }
-<h2>Login</h2>
 
-<form asp-action="Login" method="post">
+<style>
+    body {
+        background: #f3f4f6;
+        font-family: Arial, sans-serif;
+    }
 
-    <div>
-        <label>Email</label>
-        <input asp-for="Email" />
+    .login-container {
+        max-width: 420px;
+        margin: 80px auto;
+    }
+
+    .login-card {
+        background: #fff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    }
+
+    .login-title {
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    label {
+        font-weight: 600;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    input {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        margin-bottom: 15px;
+    }
+
+        input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+    .btn-login {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        background: #2563eb;
+        color: white;
+        font-weight: bold;
+        border: none;
+    }
+
+        .btn-login:hover {
+            background: #1e40af;
+        }
+
+    .alert {
+        border-radius: 8px;
+        text-align: center;
+    }
+</style>
+
+<div class="login-container">
+
+    <div class="login-card">
+
+        <div class="login-title">Login</div>
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
+        <form asp-action="Login" method="post">
+
+            <!-- Email -->
+            <div>
+                <label>Email</label>
+                <input asp-for="Email" placeholder="Enter email" />
+            </div>
+
+            <!-- Password -->
+            <div>
+                <label>Password</label>
+                <input asp-for="Password" type="password" placeholder="Enter password" />
+            </div>
+
+            <!-- Button -->
+            <button type="submit" class="btn-login">
+                Login
+            </button>
+
+        </form>
+
     </div>
 
-    <div>
-        <label>Password</label>
-        <input asp-for="Password" type="password" />
-    </div>
-
-    <button type="submit">Login</button>
-
-</form>
+</div>

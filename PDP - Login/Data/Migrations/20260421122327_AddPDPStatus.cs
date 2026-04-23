@@ -65,23 +65,23 @@ namespace PDP___Login.Data.Migrations
                     FileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FilePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ContentType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PDPId = table.Column<int>(type: "int", nullable: false)
+                    
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_PDPFiles", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PDPFiles_PDPs_PDPId",
-                        column: x => x.PDPId,
+                        name: "FK_PDPFiles_PDPs_Id",
+                        column: x => x.Id,
                         principalTable: "PDPs",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_PDPFiles_PDPId",
+                name: "IX_PDPFiles_Id",
                 table: "PDPFiles",
-                column: "PDPId");
+                column: "Id");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_PDPs_AspNetUsers_UserId",

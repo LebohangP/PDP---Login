@@ -1,0 +1,34 @@
+﻿@model List<UserWithRoleViewModel>
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2 class="mb-3">All Employees (With Roles)</h2>
+
+<table class="table table-striped table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th>Full Name</th>
+            <th>Email</th>
+            <th>Department</th>
+            <th>Role</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.FirstName @user.LastName</td>
+                <td>@user.Email</td>
+                <td>@user.Department</td>
+                <td>
+                    <span class="badge bg-success">
+                        @user.Role.Name
+                    </span>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -8,117 +8,115 @@ using System.Security.Claims;
 
 namespace PDP___Login.Controllers
 {
-    [Authorize(Roles = "Employee")]
-    public class EmployeeController : Controller
+
+    public class EmployeesController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly AppDbContext _context;
 
-        private readonly UserManager<ApplicationUser> _userManager;
-
-        public EmployeeController(UserManager<ApplicationUser> userManager, ApplicationDbContext context)
+        public EmployeesController(AppDbContext context)
         {
-            _userManager = userManager;
             _context = context;
         }
 
-        // ============================
-        // DASHBOARD
-        // ============================
         public IActionResult Index()
         {
             return View();
         }
-
-        // ============================
-        // GET: Submit PDP Form
-        // ============================
-        public async Task<IActionResult> SubmitPDP()
-        {
-            var user = await _userManager.GetUserAsync(User);
-
-            if (user == null)
-                return NotFound();
-
-            var model = new UserPDPViewModel
-            {
-                FullName = user.FullName,
-                Department = user.Department
-            };
-
-            return View(model);
-        }
-
-        // ============================
-        // POST: Submit PDP
-        // ============================
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SubmitPDP(UserPDPViewModel model)
-        {
-            var user = await _userManager.GetUserAsync(User);
-
-            if (user == null)
-                return NotFound();
-
-            // 🔥 re-fill values
-            model.FullName = user.FullName;
-            model.Department = user.Department;
-
-            if (!ModelState.IsValid)
-                return View(model);
-
-            string filePath = null;
-
-            if (model.PdfFile != null && model.PdfFile.Length > 0)
-            {
-                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
-
-                if (!Directory.Exists(uploadsFolder))
-                    Directory.CreateDirectory(uploadsFolder);
-
-                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(model.PdfFile.FileName);
-                var fullPath = Path.Combine(uploadsFolder, fileName);
-
-                using (var stream = new FileStream(fullPath, FileMode.Create))
-                {
-                    await model.PdfFile.CopyToAsync(stream);
-                }
-
-                filePath = "/uploads/" + fileName;
-            }
-
-            var pdp = new PDP
-            {
-                Description = model.Description,
-                DateSubmitted = DateTime.Now,
-                UserId = user.Id,
-                FilePath = filePath,
-                Status = "Pending"
-            };
-
-            _context.PDPs.Add(pdp);
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction(nameof(MyPDPs));
-        }
-
-        // ============================
-        // VIEW: My PDP Statuses
-        // ============================
         public IActionResult MyPDPs()
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = HttpContext.Session.GetInt32("UserID");
 
+            if (userId == null)
+            {
+                return RedirectToAction("Index", "Employee");
+            }
+
+            var employee = _context.Employees
+                .FirstOrDefault(e => e.UserID == userId.Value);
             var pdps = _context.PDPs
-                .Where(p => p.UserId == userId)
-                .OrderByDescending(p => p.DateSubmitted)
-                .ToList();
+            .Include(p => p.Files)
+            .Where(p => p.EmployeeID == employee.EmployeeID)
+            .ToList();
 
             return View(pdps);
+
+        }
+        [HttpGet]
+        public IActionResult EditSubmission(int id)
+        {
+            var pdp = _context.PDPs
+                .Include(p => p.Files)
+                .FirstOrDefault(p => p.Id == id);
+
+            if (pdp == null)
+                return NotFound();
+
+            return View(pdp);
+        }
+        [HttpPost]
+        public IActionResult EditSubmission(PDP model, IFormFile file)
+        {
+            var pdp = _context.PDPs
+                .Include(p => p.Files)
+                .FirstOrDefault(p => p.Id == model.Id);
+
+            if (pdp == null)
+            {
+                return NotFound();
+            }
+
+            // 1. Update title (if edited)
+            pdp.Title = model.Title;
+
+            // 2. Replace file if new one uploaded
+            if (file != null && file.Length > 0)
+            {
+                // Remove old file from folder + DB
+                var oldFile = pdp.Files.FirstOrDefault();
+
+                if (oldFile != null)
+                {
+                    var oldPath = Path.Combine("wwwroot", oldFile.FilePath.TrimStart('/'));
+
+                    if (System.IO.File.Exists(oldPath))
+                    {
+                        System.IO.File.Delete(oldPath);
+                    }
+
+                    _context.PDPFiles.Remove(oldFile);
+                }
+
+                // Save new file
+                var fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
+                var path = Path.Combine("wwwroot/pdpfiles", fileName);
+
+                using (var stream = new FileStream(path, FileMode.Create))
+                {
+                    file.CopyTo(stream);
+                }
+
+                // Add new record
+                var newFile = new PDPFile
+                {
+                    Id = pdp.Id, // FK to PDP
+                    FileName = file.FileName,
+                    FilePath = "/pdpfiles/" + fileName,
+                    SubmittedAt = DateTime.Now
+                };
+
+                _context.PDPFiles.Add(newFile);
+            }
+
+            _context.SaveChanges();
+
+            return RedirectToAction("MyPDPs");
+        }
+        public IActionResult EditSubmission()
+        {
+            return View();
+
+
         }
     }
-
-
-
 }
 

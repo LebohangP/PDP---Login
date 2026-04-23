@@ -9,7 +9,7 @@ using PDP___Login.Data;
 
 namespace PDP___Login.Data.Migrations
 {
-    [DbContext(typeof(ApplicationDbContext))]
+    //[DbContext(typeof(ApplicationDbContext))]
     [Migration("00000000000000_CreateIdentitySchema")]
     partial class CreateIdentitySchema
     {

@@ -13,8 +13,8 @@
     @foreach (var item in Model)
     {
         <tr>
-            <td>@item.User.FullName</td>
-            <td>@item.Description</td>
+            <td>@item.Employee.FirstName @item.Employee.LastName</td>
+            <td>@item.Title</td>
             <td>@item.Status</td>
             <td>
                 <a href="/PDP/Approve/@item.Id">Approve</a> |

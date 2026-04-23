@@ -16,8 +16,8 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>@item.Description</td>
-                <td>@item.DateSubmitted.ToShortDateString()</td>
+                <td>@item.Title</td>
+                <td>@item.SubmittedAt.ToShortDateString()</td>
                 <td>
                     @if (item.Status == "Pending")
                     {
@@ -33,9 +33,16 @@
                     }
                 </td>
                 <td>
-                    @if (!string.IsNullOrEmpty(item.FilePath))
+                    @if (item.Files != null && item.Files.Any())
                     {
-                        <a href="@item.FilePath" target="_blank">View PDF</a>
+                        foreach (var file in item.Files)
+                        {
+                            <a href="@file.FilePath" target="_blank">View PDF</a>
+                        }
+                    }
+                    else
+                    {
+                        <span>No file uploaded</span>
                     }
                 </td>
             </tr>

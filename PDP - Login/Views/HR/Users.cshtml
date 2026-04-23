@@ -16,11 +16,11 @@
         @foreach (var user in Model)
         {
             <tr>
-                <td>@user.FullName</td>
+                <td>@user.FirstName @user.LastName</td>
                 <td>@user.Email</td>
                 <td>@user.Department</td>
                 <td>
-                    @if (user.Role == "No Role")
+                    @if (user.Role.Name == "No Role")
                     {
                         <span class="badge bg-warning">No Role</span>
                     }

@@ -1,116 +1,121 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using PDP___Login.Data;
 using PDP___Login.Models;
 
 namespace PDP___Login.Controllers
 {
+
     public class AccountController : Controller
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        private readonly AppDbContext _context;
+
+        public AccountController(AppDbContext context)
         {
-            _signInManager = signInManager;
-            _userManager = userManager;
+            _context = context;
         }
-        [HttpGet]
         public IActionResult Register()
         {
             return View();
         }
 
-
         [HttpPost]
-        public async Task<IActionResult> Register(RegisterViewModel model)
+        public IActionResult Register(RegisterViewModel model)
         {
             if (!ModelState.IsValid)
-            {
                 return View(model);
-            }
-            var user = new ApplicationUser
+
+            var defaultRole = _context.Roles.FirstOrDefault(r => r.Name == "No Role");
+
+
+            var user = new User
             {
-                UserName = model.Email,
                 Email = model.Email,
-                FullName = model.FullName,
-                Department = model.Department
+                PasswordHash = model.Password,
+                Role = defaultRole
+
+
             };
-            var result = await _userManager.CreateAsync(user, model.Password);
-            if (result.Succeeded)
+
+            _context.Users.Add(user);
+            _context.SaveChanges();
+            var UserId = user.UserID;
+
+            // 2. Create Employee profile
+            var employee = new Employee
             {
-                //await _userManager.AddToRoleAsync(user, "Employee");
-                TempData["SuccessMessage"] = "Registration successful. Please log in.";
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Department = model.Department,
+                UserID = UserId,
+                Email = model.Email,
+            };
 
-                return RedirectToAction("Login", "Account");
-            }
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError("Password", error.Description);
-            }
+            _context.Employees.Add(employee);
+            _context.SaveChanges();
 
-            
-            return View(model);
+            TempData["Success"] = "Account successfully created. Please log in.";
 
+            return RedirectToAction("Login");
         }
-        [HttpGet]
+
+        // GET: Login
         public IActionResult Login()
         {
             return View();
         }
+
+        // POST: Login
         [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model)
+        public IActionResult Login(string email, string password)
         {
+            var user = _context.Users
+                .FirstOrDefault(u => u.Email == email && u.PasswordHash == password);
 
-            if (!ModelState.IsValid)
+            if (user == null)
             {
-                return View(model);
-            }
-            
-            var result = await _signInManager.PasswordSignInAsync(
-                model.Email,
-                model.Password,
-                isPersistent: false,
-                lockoutOnFailure: false
-            );
-
-            if (result.Succeeded)
-            {
-                var user = await _userManager.FindByEmailAsync(model.Email);
-                var roles = await _userManager.GetRolesAsync(user);
-
-                if (user == null)
-                {
-                    ModelState.AddModelError("", "Invalid login attempt.");
-                    return View(model);
-                }
-                
-                // ROLE-BASED REDIRECTION
-                if (await _userManager.IsInRoleAsync(user, "HR"))
-                    return RedirectToAction("Index", "HR");
-
-                if (await _userManager.IsInRoleAsync(user, "Manager"))
-                    return RedirectToAction("Index", "Manager");
-
-                if (await _userManager.IsInRoleAsync(user, "Employee"))
-                    return RedirectToAction("Index", "Employee");
-
-                return RedirectToAction("NoRole");
+                ViewBag.Error = "Invalid login";
+                return View();
             }
 
-            ModelState.AddModelError("", "Invalid login attempt.");
-            return View(model);
-        }
-        public IActionResult NoRole()
-        {
+            HttpContext.Session.SetInt32("UserID", user.UserID);
+            HttpContext.Session.SetString("Email", user.Email);
+
+
+            // 🚨 BLOCK users without roles
+            if (user.RoleId == 4)
+            {
+
+                return View("NoRole");
+            }
+
+            // Save session
+            HttpContext.Session.SetInt32("UserId", user.UserID);
+            HttpContext.Session.SetInt32("RoleId", user.RoleId);
+
+            // Redirect by role
+            if (user.RoleId == 1)
+                return RedirectToAction("Dashboard", "Admin");
+
+            if (user.RoleId == 2)
+                return RedirectToAction("Dashboard", "Manager");
+
+            if (user.RoleId == 3)
+                return RedirectToAction("Index", "Employees");
+
+
             return View();
         }
-        public async Task<IActionResult> Logout()
+
+        public IActionResult Logout()
         {
-            await _signInManager.SignOutAsync();
-            
-            await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
-            return RedirectToAction("Login", "Account");
+            HttpContext.Session.Clear();
+            return RedirectToAction("Login");
         }
+
     }
 }
+
+
+
