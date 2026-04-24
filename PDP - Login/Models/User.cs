@@ -8,7 +8,7 @@ namespace PDP___Login.Models
         public string Email { get; set; }
         public string PasswordHash { get; set; }
 
-        public int RoleId { get; set; }
+        public int RoleID { get; set; }
         public Role Role { get; set; }
 
         public Employee Employee { get; set; } // one-to-one

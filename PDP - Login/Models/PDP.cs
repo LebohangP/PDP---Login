@@ -7,6 +7,7 @@
 
         public string Status { get; set; } = "Pending";
         public DateTime SubmittedAt { get; set; }
+        public string? Comment { get; set; }
 
         public int EmployeeID { get; set; }
         public Employee Employee { get; set; }

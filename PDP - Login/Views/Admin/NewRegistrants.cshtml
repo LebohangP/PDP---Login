@@ -31,7 +31,10 @@
                         <select name="roleId" class="form-select">
                             @foreach (var role in user.Roles)
                             {
-                                <option value="@role.RoleId">@role.Name</option>
+                                <option value="@role.RoleID"
+                                        selected="@(role.RoleID == user.RoleID ? "selected" : null)">
+                                    @role.Name
+                                </option>
                             }
                         </select>
 

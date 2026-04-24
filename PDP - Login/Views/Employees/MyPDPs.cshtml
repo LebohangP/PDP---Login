@@ -11,6 +11,8 @@
             <th>Date</th>
             <th>Status</th>
             <th>File</th>
+            <th>Rejection Comment</th> <!-- 🔥 NEW COLUMN -->
+            <th>Actions</th>
         </tr>
     </thead>
 
@@ -19,7 +21,9 @@
         {
             <tr>
                 <td>@item.Title</td>
+
                 <td>@item.SubmittedAt.ToShortDateString()</td>
+
                 <td>
                     @if (item.Status == "Pending")
                     {
@@ -34,6 +38,7 @@
                         <span style="color: red;">Rejected</span>
                     }
                 </td>
+
                 <td>
                     @if (item.Files != null && item.Files.Any())
                     {
@@ -47,6 +52,21 @@
                         <span>No file uploaded</span>
                     }
                 </td>
+
+                <!-- 🔥 REJECTION COMMENT COLUMN -->
+                <td>
+                    @if (item.Status == "Rejected" && !string.IsNullOrEmpty(item.Comment))
+                    {
+                        <span class="text-danger">
+                            @item.Comment
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="text-muted">-</span>
+                    }
+                </td>
+
                 <td>
                     <a asp-action="EditSubmission"
                        asp-route-id="@item.Id"

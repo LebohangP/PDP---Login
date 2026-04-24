@@ -1,0 +1,55 @@
+﻿@model List<PDP___Login.Models.PDP>
+@{
+    Layout = "~/Views/Shared/_EmployeeLayout.cshtml";
+}
+
+<h2 class="text-success mb-3">My Approved PDPs</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        You have no approved PDPs yet.
+    </div>
+}
+else
+{
+    <table class="table table-bordered table-hover">
+        <thead class="table-success">
+            <tr>
+                <th>Title</th>
+                <th>Status</th>
+                <th>File</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var pdp in Model)
+            {
+                <tr>
+                    <td>@pdp.Title</td>
+
+                    <td>
+                        <span class="badge bg-success">
+                            @pdp.Status
+                        </span>
+                    </td>
+
+                    <td>
+                        @if (pdp.Files != null && pdp.Files.Any())
+                        {
+                            <a href="@pdp.Files.First().FilePath"
+                               target="_blank"
+                               class="btn btn-sm btn-primary">
+                                View File
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="text-muted">No file</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

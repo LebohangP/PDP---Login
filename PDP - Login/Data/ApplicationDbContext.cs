@@ -34,20 +34,26 @@ namespace PDP___Login.Data
 
             modelBuilder.Entity<PDPFile>()
                 .HasOne(f => f.PDP)
-                .WithMany(p => p.Files) // make sure PDP has this list
+                .WithMany(p => p.Files) 
                 .HasForeignKey(f => f.Id); // FK
             base.OnModelCreating(modelBuilder);
+
+            //modelBuilder.Entity<Role>()
+            //   .HasOne(f => f.PDP)
+            //   .WithMany(p => p.Files)
+            //   .HasForeignKey(f => f.Id); // FK
+            //base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<User>()
                 .HasKey(u => u.UserID);
 
             modelBuilder.Entity<Role>()
-                .HasKey(r => r.RoleId);
+                .HasKey(r => r.RoleID);
 
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Role)
                 .WithMany(r => r.Users)
-                .HasForeignKey(u => u.RoleId)
+                .HasForeignKey(u => u.RoleID)
                 .OnDelete(DeleteBehavior.Restrict);
         }
         

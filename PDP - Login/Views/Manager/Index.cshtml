@@ -1,13 +1,18 @@
 ﻿@model List<PDP___Login.Models.PDP>
+@{
+    Layout = "~/Views/Shared/_ManagerLayout.cshtml";
+}
 
 <h2>Submitted PDPs</h2>
 
 <table class="table table-bordered">
     <thead>
         <tr>
+            <th>Employee</th>
             <th>Title</th>
             <th>Status</th>
             <th>File</th>
+            <th>Comment</th> 
             <th>Actions</th>
         </tr>
     </thead>
@@ -16,6 +21,8 @@
         @foreach (var pdp in Model)
         {
             <tr>
+                <td>@pdp.Employee?.FirstName @pdp.Employee?.LastName</td>
+
                 <td>@pdp.Title</td>
 
                 <td>
@@ -31,6 +38,24 @@
                     }
                 </td>
 
+                
+                <td>
+                    <form asp-action="UpdateStatus" method="post" style="display:flex; gap:5px;">
+
+                        <input type="hidden" name="id" value="@pdp.Id" />
+                        <input type="hidden" name="status" value="Rejected" />
+
+                        <input type="text"
+                               name="comment"
+                               class="form-control form-control-sm"
+                               placeholder="Enter reason" />
+
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            Reject
+                        </button>
+
+                    </form>
+                </td>
                 <td>
                     <a asp-action="UpdateStatus"
                        asp-route-id="@pdp.Id"
@@ -39,14 +64,43 @@
                         Approve
                     </a>
 
-                    <a asp-action="UpdateStatus"
-                       asp-route-id="@pdp.Id"
-                       asp-route-status="Rejected"
-                       class="btn btn-danger btn-sm">
-                        Reject
-                    </a>
+                    
                 </td>
             </tr>
         }
     </tbody>
 </table>
+<div class="modal fade" id="rejectModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <form asp-action="UpdateStatus" method="post">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Reject PDP</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <input type="hidden" id="pdpId" name="id" />
+                    <input type="hidden" name="status" value="Rejected" />
+
+                    <textarea name="comment"
+                              class="form-control"
+                              placeholder="Enter rejection reason"
+                              required></textarea>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-danger">
+                        Submit
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>

@@ -33,13 +33,35 @@ namespace PDP___Login.Controllers
 
             var employee = _context.Employees
                 .FirstOrDefault(e => e.UserID == userId.Value);
+
             var pdps = _context.PDPs
             .Include(p => p.Files)
-            .Where(p => p.EmployeeID == employee.EmployeeID)
+            .Where(p => p.EmployeeID == employee.EmployeeID
+                   && (p.Status == "Pending" || p.Status == "Rejected"))
             .ToList();
 
             return View(pdps);
 
+        }
+        public IActionResult ApprovedPDPs()
+        {
+            var userId = HttpContext.Session.GetInt32("UserID");
+
+            if (userId == null)
+            {
+                return RedirectToAction("Index", "Employee");
+            }
+
+            var employee = _context.Employees
+                .FirstOrDefault(e => e.UserID == userId.Value);
+
+            var pdps = _context.PDPs
+                .Include(p => p.Files)
+                .Where(p => p.EmployeeID == employee.EmployeeID
+                            && p.Status == "Approved")
+                .ToList();
+
+            return View(pdps);
         }
         [HttpGet]
         public IActionResult EditSubmission(int id)
@@ -67,6 +89,7 @@ namespace PDP___Login.Controllers
 
             // 1. Update title (if edited)
             pdp.Title = model.Title;
+            pdp.Status = "Pending";
 
             // 2. Replace file if new one uploaded
             if (file != null && file.Length > 0)

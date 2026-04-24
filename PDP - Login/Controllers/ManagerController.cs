@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PDP___Login.Data;
+using PDP___Login.Models;
 
 namespace PDP___Login.Controllers
 {
@@ -14,20 +15,26 @@ namespace PDP___Login.Controllers
         {
             _context = context;
         }
+        public IActionResult Dashboard()
+        {
+            return View();
+        }
 
         // ALL SUBMITTED PDPs
         public IActionResult Index()
         {
             var pdps = _context.PDPs
+                .Where(p => p.Status == "Pending") // 🔥 only pending
                 .Include(p => p.Files)
                 .Include(p => p.Employee)
                 .ToList();
 
             return View(pdps);
         }
-        public IActionResult UpdateStatus(int id, string status)
+        public IActionResult UpdateStatus(int id, string status,PDP model)
         {
             var pdp = _context.PDPs.FirstOrDefault(p => p.Id == id);
+            var comment = model.Comment;
 
             if (pdp == null)
             {
@@ -44,9 +51,10 @@ namespace PDP___Login.Controllers
             }
             else if (status == "Rejected")
             {
-                return RedirectToAction("RejectedPDPs");
+                pdp.Comment = comment;
             }
 
+            _context.SaveChanges();
             return RedirectToAction("Index");
         }
         public IActionResult ApprovedPDPs()
@@ -54,6 +62,7 @@ namespace PDP___Login.Controllers
             var pdps = _context.PDPs
                 .Where(p => p.Status == "Approved")
                 .Include(p => p.Files)
+                .Include(p => p.Employee)
                 .ToList();
 
             return View(pdps);
@@ -63,6 +72,7 @@ namespace PDP___Login.Controllers
             var pdps = _context.PDPs
                 .Where(p => p.Status == "Rejected")
                 .Include(p => p.Files)
+                .Include(p => p.Employee)
                 .ToList();
 
             return View(pdps);

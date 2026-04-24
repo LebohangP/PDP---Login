@@ -18,7 +18,7 @@ namespace PDP___Login.Controllers
         {
             _context = context;
         }
-        public IActionResult Dashboard()
+        public IActionResult Index()
         {
             return View();
         }
@@ -52,7 +52,7 @@ namespace PDP___Login.Controllers
             if (user == null)
                 return NotFound();
 
-            user.RoleId  = roleId;
+            user.RoleID  = roleId;
 
             _context.Users.Update(user); // 🔥 force tracking update
 
@@ -64,8 +64,8 @@ namespace PDP___Login.Controllers
         {
             var employees = (from e in _context.Employees
                              join u in _context.Users on e.UserID equals u.UserID
-                             join r in _context.Roles on u.RoleId equals r.RoleId
-                             where u.RoleId != null && r.Name != "No Role"
+                             join r in _context.Roles on u.RoleID equals r.RoleID
+                             where u.RoleID != null && r.Name != "No Role"
                              select new UserWithRoleViewModel
                              {
                                  FirstName = e.FirstName,
@@ -76,6 +76,10 @@ namespace PDP___Login.Controllers
                              }).ToList();
 
             return View(employees);
+        }
+        public IActionResult Dashboard()
+        {
+            return View();
         }
     }
 

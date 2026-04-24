@@ -84,24 +84,24 @@ namespace PDP___Login.Controllers
 
 
             // 🚨 BLOCK users without roles
-            if (user.RoleId == 4)
+            if (user.RoleID == 4)
             {
 
                 return View("NoRole");
             }
 
             // Save session
-            HttpContext.Session.SetInt32("UserId", user.UserID);
-            HttpContext.Session.SetInt32("RoleId", user.RoleId);
+            HttpContext.Session.SetInt32("UserID", user.UserID);
+            HttpContext.Session.SetInt32("RoleID", user.RoleID);
 
             // Redirect by role
-            if (user.RoleId == 1)
+            if (user.RoleID == 1)
                 return RedirectToAction("Dashboard", "Admin");
 
-            if (user.RoleId == 2)
+            if (user.RoleID == 3)
                 return RedirectToAction("Dashboard", "Manager");
 
-            if (user.RoleId == 3)
+            if (user.RoleID == 2)
                 return RedirectToAction("Index", "Employees");
 
 
